@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillSync | Event & Hackathon Team Finder</title>
+    <meta name="description" content="SkillSync is a platform designed to help college students form effective project and hackathon teams based on complementary skills.">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-layer-group text-gradient"></i>
+                <span>Skill<span class="text-gradient">Sync</span></span>
+            </div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#home" class="active" data-view="landing-view">Home</a></li>
+                <li><a href="#dashboard" data-view="dashboard-view">Dashboard</a></li>
+                <li><a href="#events" data-view="events-view">Events & Hackathons</a></li>
+                <li id="nav-admin-link" style="display: none;"><a href="#admin" data-view="admin-view" style="color: var(--danger); font-weight: 700;"><i class="fa-solid fa-shield-halved"></i> Admin Console</a></li>
+            </ul>
+            <div class="nav-actions" id="nav-actions-container">
+                <button class="btn-icon" id="theme-toggle" title="Toggle Theme" style="margin-right: 0.5rem;">
+                    <i class="fa-solid fa-sun"></i>
+                </button>
+                <div id="auth-buttons" style="display: flex; gap: 1rem;">
+                    <button class="btn btn-outline" onclick="openAuthModal('login')">Log In</button>
+                    <button class="btn btn-primary" onclick="openAuthModal('signup')">Sign Up</button>
+                </div>
+                <!-- Dynamic User Badge shown after login -->
+                <div id="user-profile-badge" style="display: none; align-items: center; gap: 0.75rem; cursor: pointer;">
+                    <img id="nav-avatar" src="" alt="User Avatar" style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--accent-primary); object-fit: cover;">
+                    <div style="display: flex; flex-direction: column;">
+                        <span id="nav-username" style="font-weight: 600; font-size: 0.9rem; line-height: 1;"></span>
+                        <span id="nav-role" class="text-secondary" style="font-size: 0.75rem;"></span>
+                    </div>
+                    <button class="btn-icon" onclick="handleLogout()" title="Log Out" style="margin-left: 0.5rem; width: 32px; height: 32px; font-size: 0.85rem;"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main id="main-content">
+        
+        <!-- View 1: Landing Page -->
+        <section id="landing-view" class="view active-view">
+            <!-- Hero Section -->
+            <header class="hero">
+                <div class="hero-bg-glow"></div>
+                <div class="container hero-container">
+                    <div class="hero-content">
+                        <div class="badge">
+                            <span class="badge-dot"></span> The Future of Team Building
+                        </div>
+                        <h1 class="hero-title">
+                            Find Your Perfect <br>
+                            <span class="text-gradient">Hackathon Squad</span>
+                        </h1>
+                        <p class="hero-subtitle">
+                            Stop settling for mismatched groups. Connect with students whose skills complement yours, level up your academic tree, and conquer your next PBL or hackathon together.
+                        </p>
+                        <div class="hero-actions">
+                            <button class="btn btn-primary btn-lg" onclick="switchView('events-view')">Find Teammates</button>
+                            <button class="btn btn-secondary btn-lg" onclick="switchView('dashboard-view')">Build Profile</button>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <h3>500+</h3>
+                                <p>Active Students</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>120+</h3>
+                                <p>Teams Formed</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3>95%</h3>
+                                <p>Match Accuracy</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-visual">
+                        <!-- Abstract Graphical Representation of Graph Matching -->
+                        <div class="matching-visualization">
+                            <div class="node node-center pulse" data-tooltip="You: Backend/DSA">
+                                <img src="https://i.pravatar.cc/100?img=11" alt="User">
+                            </div>
+                            <div class="node node-1 match-high" data-tooltip="Alex: Frontend/React (98% Match)">
+                                <span><i class="fa-brands fa-react"></i></span>
+                            </div>
+                            <div class="node node-2 match-high" data-tooltip="Sam: UI/UX Design (92% Match)">
+                                <span><i class="fa-solid fa-pen-nib"></i></span>
+                            </div>
+                            <div class="node node-3 match-medium" data-tooltip="Jordan: DevOps (75% Match)">
+                                <span><i class="fa-brands fa-docker"></i></span>
+                            </div>
+                            <!-- Connecting lines drawn via CSS -->
+                            <svg class="connections" width="100%" height="100%">
+                                <line x1="50%" y1="50%" x2="20%" y2="20%" class="line-high" />
+                                <line x1="50%" y1="50%" x2="80%" y2="30%" class="line-high" />
+                                <line x1="50%" y1="50%" x2="50%" y2="85%" class="line-medium" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Features Section -->
+            <section class="features container">
+                <div class="section-header text-center">
+                    <h2 class="section-title">Why SkillSync?</h2>
+                    <p class="section-desc">Designed specifically to solve the 'lazy group member' problem through data-driven team formation.</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card glass-panel group-hover">
+                        <div class="feature-icon"><i class="fa-solid fa-code-branch"></i></div>
+                        <h3>Smart Matching Engine</h3>
+                        <p>Our algorithm uses Directed Acyclic Graphs to analyze project requirements and suggest students with the perfect complementary skills.</p>
+                    </div>
+                    <div class="feature-card glass-panel group-hover">
+                        <div class="feature-icon"><i class="fa-solid fa-ranking-star"></i></div>
+                        <h3>RPG Skill Trees</h3>
+                        <p>Visually track your academic progress. Complete hackathons and prerequisites to level up your technical skills and unlock new opportunities.</p>
+                    </div>
+                    <div class="feature-card glass-panel group-hover">
+                        <div class="feature-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+                        <h3>Seamless Invites</h3>
+                        <p>A streamlined request system lets you send and accept invites instantly. Once accepted, your team workspace is automatically generated.</p>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- View 2: Dashboard (Skill Tree & Notifications) -->
+        <section id="dashboard-view" class="view">
+            <div class="container dashboard-layout">
+                <!-- Sidebar / Profile Summary -->
+                <aside class="dashboard-sidebar">
+                    <div class="glass-panel profile-card">
+                        <div class="profile-header">
+                            <img src="https://i.pravatar.cc/150?img=11" alt="Profile" class="profile-avatar">
+                            <div class="level-badge">Lvl 12</div>
+                        </div>
+                        <h2 class="profile-name">Alex Developer</h2>
+                        <p class="profile-role">Computer Science / Business Systems</p>
+                        
+                        <div class="profile-stats">
+                            <div class="p-stat">
+                                <span class="stat-val">4</span>
+                                <span class="stat-label">Hackathons</span>
+                            </div>
+                            <div class="p-stat">
+                                <span class="stat-val">8</span>
+                                <span class="stat-label">Projects</span>
+                            </div>
+                            <div class="p-stat text-primary">
+                                <span class="stat-val">98%</span>
+                                <span class="stat-label">Team Rating</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Requests -->
+                    <div class="glass-panel mt-4">
+                        <h3 class="panel-title border-bottom pb-2 mb-3">Active Invites <span class="badge">2</span></h3>
+                        <div class="invite-item">
+                            <div class="invite-info">
+                                <strong>HackTheFuture 2026</strong>
+                                <span class="invite-sender">from Team Synergy</span>
+                                <span class="invite-role">Req: Backend Lead</span>
+                            </div>
+                            <div class="invite-actions">
+                                <button class="btn-icon btn-accept" title="Accept"><i class="fa-solid fa-check"></i></button>
+                                <button class="btn-icon btn-decline" title="Decline"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
+                        <div class="invite-item mt-3">
+                            <div class="invite-info">
+                                <strong>PBL Sem 4 Group</strong>
+                                <span class="invite-sender">from Sarah J.</span>
+                                <span class="invite-role">Req: Database Architecture</span>
+                            </div>
+                            <div class="invite-actions">
+                                <button class="btn-icon btn-accept" title="Accept"><i class="fa-solid fa-check"></i></button>
+                                <button class="btn-icon btn-decline" title="Decline"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main Content / Skill Tree -->
+                <div class="dashboard-main">
+                    <div class="glass-panel skill-tree-panel">
+                        <div class="panel-header flex-between mb-4">
+                            <div>
+                                <h2 class="panel-title text-gradient">Your Academic Skill Tree</h2>
+                                <p class="text-sm text-gray">Unlock new nodes by completing projects and prerequisite courses.</p>
+                            </div>
+                            <div class="legend">
+                                <span class="legend-item"><span class="dot dot-mastered"></span> Mastered</span>
+                                <span class="legend-item"><span class="dot dot-mastering"></span> Proficient</span>
+                                <span class="legend-item"><span class="dot dot-learning"></span> Learning</span>
+                                <span class="legend-item"><span class="dot dot-locked"></span> Locked</span>
+                            </div>
+                        </div>
+
+                        <!-- Skill Tree Visualization Area -->
+                        <div class="skill-tree-container">
+                            <!-- Foundation -->
+                            <div class="st-level">
+                                <div class="st-node mastered" data-xp="100%">
+                                    <div class="st-icon"><i class="fa-brands fa-java"></i></div>
+                                    <span class="st-label">Core Java</span>
+                                </div>
+                                <div class="st-node mastered" data-xp="100%">
+                                    <div class="st-icon"><i class="fa-solid fa-database"></i></div>
+                                    <span class="st-label">SQL</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Connecting lines -->
+                            <div class="st-connector-row"><div class="st-line vertical active"></div><div class="st-line vertical active"></div></div>
+                            
+                            <!-- Intermediate -->
+                            <div class="st-level mb-4">
+                                <div class="st-node mastering" data-xp="75%">
+                                    <div class="st-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                                    <span class="st-label">Data Structures</span>
+                                </div>
+                                <div class="st-node mastered" data-xp="100%">
+                                    <div class="st-icon"><i class="fa-solid fa-server"></i></div>
+                                    <span class="st-label">Spring Boot</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Advanced Level -->
+                            <div class="st-level">
+                                <div class="st-node learning" data-xp="30%">
+                                    <div class="st-icon"><i class="fa-solid fa-brain"></i></div>
+                                    <span class="st-label">Machine Learning</span>
+                                </div>
+                                <div class="st-node locked" data-xp="0%">
+                                    <div class="st-icon"><i class="fa-brands fa-aws"></i></div>
+                                    <span class="st-label">Cloud Deployment</span>
+                                </div>
+                                <div class="st-node locked" data-xp="0%">
+                                    <div class="st-icon"><i class="fa-solid fa-microchip"></i></div>
+                                    <span class="st-label">System Design</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- View 3: Events & Hackathons -->
+        <section id="events-view" class="view">
+            <div class="container">
+                <div class="section-header flex-between mb-4 mt-2">
+                    <div>
+                        <h2 class="section-title">Discover Events</h2>
+                        <p class="section-desc">Find hackathons and PBL opportunities. The system automatically highlights events that match your skill profile.</p>
+                    </div>
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" placeholder="Search events...">
+                    </div>
+                </div>
+
+                <div class="events-grid" id="events-container">
+                    <!-- Events will be populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- View 4: Teammate Finder / Match Results -->
+        <section id="teammates-view" class="view">
+            <div class="container">
+                <div class="section-header flex-between mb-4 mt-2">
+                    <div>
+                        <button class="btn btn-outline btn-sm mb-3" onclick="switchView('events-view')">
+                            <i class="fa-solid fa-arrow-left"></i> Back to Events
+                        </button>
+                        <h2 class="section-title" id="team-finder-title">Finding Teammates for...</h2>
+                        <p class="section-desc">Based on the skills required for this event, here are the best matches for your squad.</p>
+                    </div>
+                    <div class="search-bar">
+                        <i class="fa-solid fa-filter"></i>
+                        <input type="text" placeholder="Filter by skill (e.g., React)...">
+                    </div>
+                </div>
+
+                <div class="events-grid" id="teammates-container">
+                    <!-- Teammate profiles will be populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- View 5: Admin Management Panel -->
+        <section id="admin-view" class="view">
+            <div class="container">
+                <div class="section-header flex-between mb-4 mt-2">
+                    <div>
+                        <h2 class="section-title text-gradient" style="background: linear-gradient(135deg, var(--danger), var(--warning)); -webkit-background-clip: text; background-clip: text;">Admin Control Panel</h2>
+                        <p class="section-desc">Manage all platform data including students and hackathons.</p>
+                    </div>
+                </div>
+
+                <div class="admin-tables-container" style="display: flex; flex-direction: column; gap: 3rem;">
+                    <!-- Users Table -->
+                    <div class="glass-panel">
+                        <h3 class="mb-3 border-bottom pb-2"><i class="fa-solid fa-users text-primary"></i> Registered Students</h3>
+                        <div class="table-responsive">
+                            <table class="admin-table" id="admin-users-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Create Event Form -->
+                    <div class="glass-panel" style="margin-bottom: 2rem;">
+                        <h3 class="mb-3 border-bottom pb-2"><i class="fa-solid fa-square-plus text-success"></i> Create New Hackathon</h3>
+                        <form id="admin-create-event-form" onsubmit="handleCreateEvent(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label>Event Title</label>
+                                <input type="text" id="admin-ev-title" required placeholder="Winter Cyber Jam">
+                            </div>
+                            <div class="form-group">
+                                <label>Event Date (e.g. Jan 10)</label>
+                                <input type="text" id="admin-ev-date" required placeholder="Jan 10 - Jan 12">
+                            </div>
+                            <div class="form-group">
+                                <label>Mode</label>
+                                <input type="text" id="admin-ev-mode" required placeholder="Online / Hybrid">
+                            </div>
+                            <div class="form-group">
+                                <label>Type</label>
+                                <input type="text" id="admin-ev-type" required placeholder="Hackathon, Game Jam...">
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>Description</label>
+                                <textarea id="admin-ev-desc" required placeholder="Write a short description..." rows="2" style="width: 100%; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); padding: 0.75rem; color: var(--text-primary); font-family: inherit; font-size: inherit;"></textarea>
+                            </div>
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>Required Skills (comma separated)</label>
+                                <input type="text" id="admin-ev-skills" required placeholder="React, Node.js, Python">
+                            </div>
+                            <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
+                                <button type="submit" class="btn btn-primary" style="border-radius: 8px;">Create Event <i class="fa-solid fa-check"></i></button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Events Table -->
+                    <div class="glass-panel">
+                        <h3 class="mb-3 border-bottom pb-2"><i class="fa-solid fa-calendar-days text-primary"></i> Active Hackathons</h3>
+                        <div class="table-responsive">
+                            <table class="admin-table" id="admin-events-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Mode</th>
+                                        <th>Type</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Auth Modal Overlay -->
+    <div id="auth-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-panel" style="background: var(--bg-secondary); border-color: var(--accent-primary);">
+            <button class="modal-close" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Log In</button>
+                <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="login-email" required placeholder="name@skillsync.edu">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••••">
+                </div>
+                <p id="auth-error-msg" class="text-danger text-sm hidden font-weight: 500;" style="margin-bottom: 1rem;"></p>
+                <button type="submit" class="btn btn-primary" style="width: 100%; border-radius: 8px;">Access Platform <i class="fa-solid fa-arrow-right"></i></button>
+                <p class="text-sm text-center mt-3 text-secondary">Demo account: rahul@skillsync.edu / password123</p>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="signup-form" class="auth-form hidden" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="signup-name" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="signup-email" required placeholder="john@skillsync.edu">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="signup-password" required minlength="6" placeholder="At least 6 characters">
+                </div>
+                <div class="form-group">
+                    <label>Skill / Role (e.g. Frontend Developer, UI/UX)</label>
+                    <input type="text" id="signup-role" required placeholder="Type your primary skills...">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; border-radius: 8px;">Create Account <i class="fa-solid fa-user-plus"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p>&copy; 2026 SkillSync.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

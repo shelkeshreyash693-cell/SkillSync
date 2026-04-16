@@ -1,0 +1,11 @@
+admin username:- admin@skillsync.edu 
+admin passwoed:- admin123
+1.username:-shreyash@skillsync.edu 
+  password:- 987654
+2.username:-riya@skillsync.edu
+  password:-654321
+3.username:-anand@skillsync.edu
+  password:-963258
+
+1.sign up madhe skills choose krtana ajun options dene.
+2.Admin portal madhe active hackathons, add karnaycha option add karne.

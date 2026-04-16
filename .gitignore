@@ -1,0 +1,15 @@
+# Backend Java Artifacts
+skillsync-backend/target/
+skillsync-backend/*.jar
+
+# Ignore our persistent H2 database file so it doesn't cause merge conflicts for your teammates!
+skillsync-backend/data/
+
+# IDE configuration files
+.vscode/
+.idea/
+*.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db
