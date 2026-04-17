@@ -81,115 +81,127 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// Render Events dynamically from Spring Boot Backend
+/// Helper: sleep for ms milliseconds
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+// Render Events dynamically from Spring Boot Backend (with cold-start retry)
 async function renderEvents() {
     const container = document.getElementById('events-container');
-    container.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;"><i class="fa-solid fa-spinner fa-spin"></i> Loading events from backend...</p>';
+    const MAX_RETRIES = 4;
+    const RETRY_DELAY_MS = 12000;
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/events`);
-        if (!response.ok) throw new Error('Backend not available');
-        const loadedEvents = await response.json();
-        
-        container.innerHTML = '';
-        
-        if (loadedEvents.length === 0) {
-            container.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">No events found in the database.</p>';
-            return;
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        // Update loading message based on attempt number
+        if (attempt === 1) {
+            container.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;"><i class="fa-solid fa-spinner fa-spin"></i> Loading events...</p>';
+        } else {
+            container.innerHTML = `
+                <div class="glass-panel text-center" style="grid-column: 1 / -1; padding: 2rem;">
+                    <i class="fa-solid fa-server fa-beat-fade" style="font-size: 2.5rem; color: var(--accent-primary); margin-bottom: 1rem;"></i>
+                    <h3 style="margin-bottom:0.5rem;">Waking Up Server...</h3>
+                    <p class="text-secondary">The server was asleep. Retrying (${attempt}/${MAX_RETRIES}) — this takes up to 60 seconds on first load.</p>
+                    <div style="margin-top:1rem; height:4px; border-radius:2px; background:rgba(255,255,255,0.1); overflow:hidden;">
+                        <div style="height:100%; width:${(attempt/MAX_RETRIES)*100}%; background:var(--accent-primary); transition:width 0.5s ease;"></div>
+                    </div>
+                </div>`;
         }
 
-        // Group by month
-        const eventsByMonth = {};
-        const monthMap = {
-            'Jan': 'January', 'Feb': 'February', 'Mar': 'March', 'Apr': 'April',
-            'May': 'May', 'Jun': 'June', 'Jul': 'July', 'Aug': 'August', 
-            'Sep': 'September', 'Oct': 'October', 'Nov': 'November', 'Dec': 'December'
-        };
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+            const response = await fetch(`${API_BASE_URL}/events`, { signal: controller.signal });
+            clearTimeout(timeoutId);
 
-        loadedEvents.forEach(event => {
-            const shortMonth = event.date.split(' ')[0];
-            const fullMonth = monthMap[shortMonth] || shortMonth;
-            
-            if (!eventsByMonth[fullMonth]) {
-                eventsByMonth[fullMonth] = [];
+            if (!response.ok) throw new Error('Backend not available');
+            const loadedEvents = await response.json();
+
+            container.innerHTML = '';
+
+            if (loadedEvents.length === 0) {
+                container.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">No events found in the database.</p>';
+                return;
             }
-            eventsByMonth[fullMonth].push(event);
-        });
 
-        // Loop through each grouped month and render separately
-        for (const [month, monthEvents] of Object.entries(eventsByMonth)) {
-            
-            // Month Header spanning all columns
-            const monthHeader = `
-                <div style="grid-column: 1 / -1; margin-top: 2rem; margin-bottom: 0.5rem; border-bottom: 2px solid rgba(255, 255, 255, 0.05); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <i class="fa-regular fa-calendar-days text-gradient" style="font-size: 1.5rem;"></i>
-                    <h2 style="font-size: 1.8rem; font-weight: 700; margin: 0; color: var(--text-primary); letter-spacing: -0.5px;">${month}</h2>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', monthHeader);
+            // Group by month
+            const eventsByMonth = {};
+            const monthMap = {
+                'Jan': 'January', 'Feb': 'February', 'Mar': 'March', 'Apr': 'April',
+                'May': 'May', 'Jun': 'June', 'Jul': 'July', 'Aug': 'August',
+                'Sep': 'September', 'Oct': 'October', 'Nov': 'November', 'Dec': 'December'
+            };
 
-            // Render each event belonging to this month
-            monthEvents.forEach(event => {
-                // Simulated Match Score for the current user against this event
-                const simulatedMatchScore = Math.floor(Math.random() * 40) + 50; 
-                
-                let badgeColor = "var(--success)";
-                let badgeBg = "rgba(16, 185, 129, 0.15)";
-                
-                if (simulatedMatchScore < 60) {
-                    badgeColor = "var(--text-muted)";
-                    badgeBg = "rgba(100, 116, 139, 0.15)";
-                } else if (simulatedMatchScore < 80) {
-                    badgeColor = "var(--warning)";
-                    badgeBg = "rgba(245, 158, 11, 0.15)";
-                }
+            loadedEvents.forEach(event => {
+                const shortMonth = event.date.split(' ')[0];
+                const fullMonth = monthMap[shortMonth] || shortMonth;
+                if (!eventsByMonth[fullMonth]) eventsByMonth[fullMonth] = [];
+                eventsByMonth[fullMonth].push(event);
+            });
 
-                const reqSkillsHTML = event.requiredSkills ? event.requiredSkills.map(s => `<span class="badge" style="border-radius: 4px; font-size: 0.7rem; padding: 0.2rem 0.5rem;">${s}</span>`).join('') : '';
-
-                const cardHTML = `
-                    <div class="feature-card glass-panel event-card">                    
-                        <div class="match-badge" style="color: ${badgeColor}; border-color: ${badgeColor}; background: ${badgeBg}">
-                            <span><i class="fa-solid fa-bolt"></i> Match Score</span>
-                            <span class="match-score">${simulatedMatchScore}%</span>
-                        </div>
-                        
-                        <h3 class="event-title">${event.title}</h3>
-                        
-                        <div class="event-meta" style="margin-bottom: 0.5rem; gap: 1rem;">
-                            <span><i class="fa-regular fa-calendar"></i> ${event.date}</span>
-                            <span><i class="fa-solid fa-location-dot"></i> ${event.mode}</span>
-                        </div>
-                        
-                        <span class="badge" style="margin-bottom: 1rem; align-self: flex-start; background: rgba(168, 85, 247, 0.15); color: var(--accent-secondary); border-color: rgba(168, 85, 247, 0.3); font-weight: 500;">${event.type}</span>
-                        
-                        <p class="event-desc">${event.description}</p>
-                        
-                        <div class="mb-3">
-                            <p class="text-sm text-gray mb-1">Required Skills:</p>
-                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                                ${reqSkillsHTML}
-                            </div>
-                        </div>
-
-                        <button class="btn btn-outline" style="width: 100%; margin-top: auto;" onclick="openTeamFinder(${event.id}, '${event.title.replace(/'/g, "\\'")}')">
-                            View & Find Team
-                        </button>
+            // Loop through each grouped month and render separately
+            for (const [month, monthEvents] of Object.entries(eventsByMonth)) {
+                const monthHeader = `
+                    <div style="grid-column: 1 / -1; margin-top: 2rem; margin-bottom: 0.5rem; border-bottom: 2px solid rgba(255, 255, 255, 0.05); padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fa-regular fa-calendar-days text-gradient" style="font-size: 1.5rem;"></i>
+                        <h2 style="font-size: 1.8rem; font-weight: 700; margin: 0; color: var(--text-primary); letter-spacing: -0.5px;">${month}</h2>
                     </div>
                 `;
-                container.insertAdjacentHTML('beforeend', cardHTML);
-            });
+                container.insertAdjacentHTML('beforeend', monthHeader);
+
+                monthEvents.forEach(event => {
+                    const simulatedMatchScore = Math.floor(Math.random() * 40) + 50;
+                    let badgeColor = "var(--success)";
+                    let badgeBg = "rgba(16, 185, 129, 0.15)";
+                    if (simulatedMatchScore < 60) { badgeColor = "var(--text-muted)"; badgeBg = "rgba(100, 116, 139, 0.15)"; }
+                    else if (simulatedMatchScore < 80) { badgeColor = "var(--warning)"; badgeBg = "rgba(245, 158, 11, 0.15)"; }
+
+                    const reqSkillsHTML = event.requiredSkills ? event.requiredSkills.map(s => `<span class="badge" style="border-radius: 4px; font-size: 0.7rem; padding: 0.2rem 0.5rem;">${s}</span>`).join('') : '';
+
+                    const cardHTML = `
+                        <div class="feature-card glass-panel event-card">
+                            <div class="match-badge" style="color: ${badgeColor}; border-color: ${badgeColor}; background: ${badgeBg}">
+                                <span><i class="fa-solid fa-bolt"></i> Match Score</span>
+                                <span class="match-score">${simulatedMatchScore}%</span>
+                            </div>
+                            <h3 class="event-title">${event.title}</h3>
+                            <div class="event-meta" style="margin-bottom: 0.5rem; gap: 1rem;">
+                                <span><i class="fa-regular fa-calendar"></i> ${event.date}</span>
+                                <span><i class="fa-solid fa-location-dot"></i> ${event.mode}</span>
+                            </div>
+                            <span class="badge" style="margin-bottom: 1rem; align-self: flex-start; background: rgba(168, 85, 247, 0.15); color: var(--accent-secondary); border-color: rgba(168, 85, 247, 0.3); font-weight: 500;">${event.type}</span>
+                            <p class="event-desc">${event.description}</p>
+                            <div class="mb-3">
+                                <p class="text-sm text-gray mb-1">Required Skills:</p>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">${reqSkillsHTML}</div>
+                            </div>
+                            <button class="btn btn-outline" style="width: 100%; margin-top: auto;" onclick="openTeamFinder(${event.id}, '${event.title.replace(/'/g, "\\'")}')">
+                                View &amp; Find Team
+                            </button>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', cardHTML);
+                });
+            }
+            return; // Success — exit the retry loop
+
+        } catch (error) {
+            console.warn(`Attempt ${attempt} failed:`, error.message);
+            if (attempt < MAX_RETRIES) {
+                await sleep(RETRY_DELAY_MS);
+            }
         }
-    } catch (error) {
-        console.error("Error fetching events:", error);
-        container.innerHTML = `
-            <div class="glass-panel text-center" style="grid-column: 1 / -1; padding: 3rem;">
-                <i class="fa-solid fa-server text-danger" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                <h3>Backend Not Connected</h3>
-                <p class="text-secondary mt-2">Could not fetch events. Ensure your Spring Boot server is running on http://localhost:8080.</p>
-            </div>
-        `;
     }
+
+    // All retries exhausted
+    container.innerHTML = `
+        <div class="glass-panel text-center" style="grid-column: 1 / -1; padding: 3rem;">
+            <i class="fa-solid fa-server text-danger" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <h3>Server Unavailable</h3>
+            <p class="text-secondary mt-2">Could not connect to the server after multiple attempts. Please refresh the page to try again.</p>
+            <button class="btn btn-outline mt-3" onclick="renderEvents()"><i class="fa-solid fa-rotate-right"></i> Retry</button>
+        </div>
+    `;
 }
+
 
 // Open Team Finder for a specific event
 async function openTeamFinder(eventId, eventTitle) {
