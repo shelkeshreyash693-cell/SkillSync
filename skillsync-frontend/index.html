@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome for Icons -->
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -151,16 +153,16 @@
                         
                         <div class="profile-stats">
                             <div class="p-stat">
-                                <span class="stat-val">4</span>
+                                <span class="stat-val" id="stat-hackathons">4</span>
                                 <span class="stat-label">Hackathons</span>
                             </div>
                             <div class="p-stat">
-                                <span class="stat-val">8</span>
+                                <span class="stat-val" id="stat-projects">8</span>
                                 <span class="stat-label">Projects</span>
                             </div>
-                            <div class="p-stat text-primary">
-                                <span class="stat-val">98%</span>
-                                <span class="stat-label">Team Rating</span>
+                            <div class="p-stat">
+                                <span class="stat-val" id="stat-invites">2</span>
+                                <span class="stat-label">Active Invites</span>
                             </div>
                         </div>
                     </div>
@@ -448,6 +450,27 @@
             <p>&copy; 2026 SkillSync.</p>
         </div>
     </footer>
+
+    <!-- Onboarding Overlay -->
+    <div id="onboarding-overlay" class="glass-panel" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(10, 10, 18, 0.95); flex-direction: column; align-items: center; justify-content: center; padding: 2rem;">
+        <div style="max-width: 500px; width: 100%; text-align: center;">
+            <i class="fa-solid fa-rocket text-gradient" style="font-size: 4rem; margin-bottom: 2rem;"></i>
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Welcome to SkillSync!</h1>
+            <p class="text-secondary" style="margin-bottom: 2rem;">Let's set up your profile to find the perfect squad.</p>
+            
+            <form id="onboarding-form" style="display: flex; flex-direction: column; gap: 1.5rem; text-align: left;">
+                <div class="form-group">
+                    <label>How many projects have you completed?</label>
+                    <input type="number" id="setup-projects" class="form-input" placeholder="e.g. 5" required>
+                </div>
+                <div class="form-group">
+                    <label>Select your starting skills (comma separated)</label>
+                    <input type="text" id="setup-skills" class="form-input" placeholder="e.g. Java, HTML, CSS" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; height: 50px; font-size: 1.1rem;">Complete Setup <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

@@ -73,11 +73,78 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem('skillsync-theme', newTheme);
     });
 
-    // Render Events
-    renderEvents();
-    
-    // Check Authentication State
-    checkAuthStatus();
+        // Load User Profile & Check Onboarding
+        const user = JSON.parse(localStorage.getItem('skillsync-user'));
+        if (user) {
+            fetchUserProfile(user.id);
+        }
+
+        // Render Events
+        renderEvents();
+});
+
+// Update Dashboard Stats & Skills
+async function fetchUserProfile(userId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/user/profile/${userId}`);
+        const data = await response.json();
+        const user = data.user;
+
+        // Check for onboarding
+        if (user.projectsCompleted === 0 || !user.projectsCompleted) {
+            document.getElementById('onboarding-overlay').style.display = 'flex';
+        }
+
+        // Update Stats
+        document.getElementById('stat-projects').innerText = user.projectsCompleted || 0;
+        document.getElementById('stat-invites').innerText = data.pendingInvites || 0;
+
+        // Render Skills
+        renderUserSkills(user.skills);
+    } catch (err) {
+        console.error("Failed to fetch profile:", err);
+    }
+}
+
+function renderUserSkills(skills) {
+    if (!skills) return;
+    document.querySelectorAll('.st-node').forEach(node => {
+        const label = node.querySelector('.st-label').innerText.toLowerCase();
+        const hasSkill = skills.some(s => label.includes(s.toLowerCase()));
+        
+        if (hasSkill) {
+            node.classList.remove('locked');
+            node.classList.add('mastered');
+            node.setAttribute('data-xp', '100%');
+        }
+    });
+}
+
+// Handle Onboarding Submission
+document.addEventListener('submit', async (e) => {
+    if (e.target.id === 'onboarding-form') {
+        e.preventDefault();
+        const user = JSON.parse(localStorage.getItem('skillsync-user'));
+        const projects = document.getElementById('setup-projects').value;
+        const skills = document.getElementById('setup-skills').value;
+
+        const response = await fetch(`${API_BASE_URL}/user/setup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: user.id, projects, skills })
+        });
+
+        if (response.ok) {
+            document.getElementById('onboarding-overlay').style.display = 'none';
+            Swal.fire({
+                title: 'Success!',
+                text: 'Your profile has been set up.',
+                icon: 'success',
+                confirmButtonColor: 'var(--accent-primary)'
+            });
+            fetchUserProfile(user.id);
+        }
+    }
 });
 
 

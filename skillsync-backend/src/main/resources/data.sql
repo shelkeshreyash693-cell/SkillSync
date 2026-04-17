@@ -1,3 +1,11 @@
+CREATE TABLE IF NOT EXISTS invitations (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    sender_id BIGINT,
+    receiver_id BIGINT,
+    event_id BIGINT,
+    status VARCHAR(20) DEFAULT 'PENDING'
+);
+
 -- Insert Mock Hackathons
 INSERT INTO events (title, date, mode, type, description) VALUES 
 ('HackTheFuture 2026', 'Oct 15 - Oct 17', 'Hybrid', 'Hackathon', 'Build innovative solutions for web3 and decentralized platforms. Top prizes for best UI and smartest contract execution.'),

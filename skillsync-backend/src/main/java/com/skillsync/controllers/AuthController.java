@@ -36,16 +36,17 @@ public class AuthController {
         }
         
         User newUser = new User(
-            request.getName(), 
-            request.getEmail(), 
-            request.getPassword(), 
+            null, // ID (auto-generated)
+            request.getEmail(),
+            request.getPassword(),
+            null, // No profile pic yet
+            0,    // 0 Projects completed
+            request.getName(),
             request.getRole() == null ? "Student" : request.getRole(),
             "https://i.pravatar.cc/150?img=" + (int)(Math.random() * 70), // Random avatar
-            1, // Starting Level 1
-            0, // 0 Projects completed
+            1,    // Starting Level 1
             List.of("HTML/CSS", "Teamwork") // Default starter skills
         );
-        
         userRepository.save(newUser);
         newUser.setPassword(null); // Don't return password string
         
