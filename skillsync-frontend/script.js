@@ -270,9 +270,48 @@ async function renderEvents() {
 }
 
 
+let countdownInterval = null;
+
 // Open Team Finder for a specific event
 async function openTeamFinder(eventId, eventTitle) {
+    // Clear previous interval if it exists
+    if (countdownInterval) clearInterval(countdownInterval);
+
     document.getElementById('team-finder-title').innerText = `Finding Teammates for ${eventTitle}`;
+    
+    // Reset filter
+    const filterInput = document.getElementById('teammate-filter');
+    if (filterInput) filterInput.value = '';
+    
+    // Simulate event stats based on eventId for consistency
+    const totalSlots = 50 + (eventId % 5) * 10;
+    const registered = 15 + (eventId % 20);
+    const slotsLeft = totalSlots - registered;
+    
+    document.getElementById('event-registered-teams').innerText = registered;
+    document.getElementById('event-slots-left').innerText = slotsLeft;
+
+    // Simulate a future deadline countdown (e.g., eventId * 2 + 3 days from now)
+    const daysToAdd = (eventId % 5) + 3;
+    const deadline = new Date().getTime() + (daysToAdd * 24 * 60 * 60 * 1000) + (Math.random() * 24 * 60 * 60 * 1000);
+    
+    countdownInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = deadline - now;
+
+        if (distance < 0) {
+            clearInterval(countdownInterval);
+            document.getElementById('event-countdown').innerText = "REGISTRATION CLOSED";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById('event-countdown').innerText = `${days}d ${hours}h ${minutes}m ${seconds}s left`;
+    }, 1000);
     
     const container = document.getElementById('teammates-container');
     container.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;"><i class="fa-solid fa-spinner fa-spin"></i> Analyzing matches...</p>';
@@ -346,6 +385,30 @@ async function openTeamFinder(eventId, eventTitle) {
         console.error("Match engine error:", err);
         container.innerHTML = '<p class="text-center text-danger" style="grid-column: 1 / -1;">Failed to connect to the smart matching engine.</p>';
     }
+}
+
+// Filter Teammates by Skill
+function filterTeammates() {
+    const filterText = document.getElementById('teammate-filter').value.toLowerCase();
+    const teammateCards = document.querySelectorAll('#teammates-container .teammate-card');
+
+    teammateCards.forEach(card => {
+        // The skills are inside badge spans within the card
+        const skillBadges = card.querySelectorAll('.badge');
+        let hasMatch = false;
+
+        skillBadges.forEach(badge => {
+            if (badge.innerText.toLowerCase().includes(filterText)) {
+                hasMatch = true;
+            }
+        });
+
+        if (hasMatch || filterText === '') {
+            card.style.display = 'flex'; // Use flex or block depending on your layout (feature-card usually uses flex/grid)
+        } else {
+            card.style.display = 'none';
+        }
+    });
 }
 
 // =========================================================================

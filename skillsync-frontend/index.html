@@ -285,16 +285,21 @@
         <section id="teammates-view" class="view">
             <div class="container">
                 <div class="section-header flex-between mb-4 mt-2">
-                    <div>
+                    <div style="flex: 1;">
                         <button class="btn btn-outline btn-sm mb-3" onclick="switchView('events-view')">
                             <i class="fa-solid fa-arrow-left"></i> Back to Events
                         </button>
                         <h2 class="section-title" id="team-finder-title">Finding Teammates for...</h2>
                         <p class="section-desc">Based on the skills required for this event, here are the best matches for your squad.</p>
+                        <div class="event-stats-panel" style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                            <span class="badge" style="background: rgba(168, 85, 247, 0.15); color: var(--accent-secondary); border-color: rgba(168, 85, 247, 0.3); font-size: 0.85rem;"><i class="fa-solid fa-clock"></i> <span id="event-countdown">Calculating deadline...</span></span>
+                            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--success); border-color: rgba(16, 185, 129, 0.3); font-size: 0.85rem;"><i class="fa-solid fa-users"></i> <span id="event-registered-teams">0</span> Teams Registered</span>
+                            <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: var(--warning); border-color: rgba(245, 158, 11, 0.3); font-size: 0.85rem;"><i class="fa-solid fa-ticket"></i> <span id="event-slots-left">0</span> Slots Left</span>
+                        </div>
                     </div>
-                    <div class="search-bar">
+                    <div class="search-bar" style="align-self: flex-start; margin-top: 2rem;">
                         <i class="fa-solid fa-filter"></i>
-                        <input type="text" placeholder="Filter by skill (e.g., React)...">
+                        <input type="text" id="teammate-filter" oninput="filterTeammates()" placeholder="Filter by skill (e.g., React)...">
                     </div>
                 </div>
 
