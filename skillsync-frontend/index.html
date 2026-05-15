@@ -144,15 +144,15 @@
                 <!-- Sidebar / Profile Summary -->
                 <aside class="dashboard-sidebar">
                     <div class="glass-panel profile-card">
-                        <div class="profile-header">
+                        <div class="profile-header" style="margin-bottom: 1rem;">
                             <div style="position: relative; display: inline-block;">
                                 <img src="https://i.pravatar.cc/150?img=11" alt="Profile" class="profile-avatar" onclick="document.getElementById('avatar-upload').click()" style="cursor: pointer; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" title="Click to update avatar">
-                                <div onclick="document.getElementById('avatar-upload').click()" style="position: absolute; bottom: 5px; right: -5px; background: var(--accent-primary); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; z-index: 10;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Edit Avatar">
+                                <div onclick="document.getElementById('avatar-upload').click()" style="position: absolute; bottom: 5px; right: -10px; background: var(--accent-primary); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; z-index: 10;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" title="Edit Avatar">
                                     <i class="fa-solid fa-pencil" style="font-size: 0.9rem;"></i>
                                 </div>
+                                <div class="level-badge" style="position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); z-index: 10; white-space: nowrap;">Lvl 12</div>
                             </div>
                             <input type="file" id="avatar-upload" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
-                            <div class="level-badge" style="z-index: 10;">Lvl 12</div>
                         </div>
                         <h2 class="profile-name">Alex Developer</h2>
                         <p class="profile-role">Computer Science / Business Systems</p>
