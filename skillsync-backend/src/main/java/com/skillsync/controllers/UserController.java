@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -67,21 +67,14 @@ public class UserController {
             Optional<User> userOpt = userRepository.findById(userId);
             if (userOpt.isEmpty()) return ResponseEntity.notFound().build();
 
-            // Create directory if not exists
-            String uploadDir = "uploads/profiles/";
-            Path uploadPath = Paths.get(uploadDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
+            // Convert file to Base64 String
+            byte[] bytes = file.getBytes();
+            String base64String = Base64.getEncoder().encodeToString(bytes);
+            String dataUri = "data:" + file.getContentType() + ";base64," + base64String;
 
-            // Save file
-            String fileName = userId + "_" + file.getOriginalFilename();
-            Path filePath = uploadPath.resolve(fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            // Update user
+            // Update user avatar
             User user = userOpt.get();
-            user.setProfilePicPath("/" + uploadDir + fileName);
+            user.setAvatar(dataUri);
             userRepository.save(user);
 
             return ResponseEntity.ok(user);

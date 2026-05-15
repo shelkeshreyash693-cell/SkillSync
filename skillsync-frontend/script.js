@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Theme Toggle Logic
     const themeToggleBtn = document.getElementById('theme-toggle');
     const themeIcon = themeToggleBtn.querySelector('i');
-    
+
     // Check for saved user preference, if any, on load of the website
     const savedTheme = localStorage.getItem('skillsync-theme');
     if (savedTheme) {
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     themeToggleBtn.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
         let newTheme = 'light';
-        
+
         if (currentTheme === 'light') {
             newTheme = 'dark';
             themeIcon.classList.remove('fa-moon');
@@ -68,19 +68,19 @@ document.addEventListener("DOMContentLoaded", () => {
             themeIcon.classList.remove('fa-sun');
             themeIcon.classList.add('fa-moon');
         }
-        
+
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('skillsync-theme', newTheme);
     });
 
-        // Load User Profile & Check Onboarding
-        const user = JSON.parse(localStorage.getItem('skillsync-user'));
-        if (user) {
-            fetchUserProfile(user.id);
-        }
+    // Load User Profile & Check Onboarding
+    const user = JSON.parse(localStorage.getItem('skillsync-user'));
+    if (user) {
+        fetchUserProfile(user.id);
+    }
 
-        // Render Events
-        renderEvents();
+    // Render Events
+    renderEvents();
 });
 
 // Update Dashboard Stats & Skills
@@ -111,7 +111,7 @@ function renderUserSkills(skills) {
     document.querySelectorAll('.st-node').forEach(node => {
         const label = node.querySelector('.st-label').innerText.toLowerCase();
         const hasSkill = skills.some(s => label.includes(s.toLowerCase()));
-        
+
         if (hasSkill) {
             node.classList.remove('locked');
             node.classList.add('mastered');
@@ -147,6 +147,65 @@ document.addEventListener('submit', async (e) => {
     }
 });
 
+// Handle Avatar Upload
+async function uploadAvatar(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const user = JSON.parse(localStorage.getItem('skillsync-user'));
+    if (!user) {
+        Swal.fire('Error', 'You must be logged in to upload an avatar.', 'error');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('userId', user.id);
+    formData.append('file', file);
+
+    try {
+        Swal.fire({
+            title: 'Uploading...',
+            text: 'Please wait while your avatar is uploaded.',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        const response = await fetch(`${API_BASE_URL}/user/upload-pic`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) throw new Error("Failed to upload avatar");
+
+        const updatedUser = await response.json();
+        
+        // Update local storage
+        localStorage.setItem('skillsync-user', JSON.stringify(updatedUser));
+        
+        // Update the image on the screen dynamically
+        document.querySelectorAll('.profile-avatar, #nav-avatar').forEach(img => {
+            img.src = updatedUser.avatar;
+        });
+
+        // Trigger SweetAlert2 success modal
+        Swal.fire({
+            title: 'Avatar Updated!',
+            text: 'Your profile picture has been successfully saved.',
+            icon: 'success',
+            confirmButtonColor: 'var(--accent-primary)'
+        });
+
+    } catch (err) {
+        console.error("Avatar upload error:", err);
+        Swal.fire({
+            title: 'Upload Failed',
+            text: 'Could not upload your profile picture. Please try again.',
+            icon: 'error',
+            confirmButtonColor: 'var(--danger)'
+        });
+    }
+}
+
 
 /// Helper: sleep for ms milliseconds
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
@@ -168,7 +227,7 @@ async function renderEvents() {
                     <h3 style="margin-bottom:0.5rem;">Waking Up Server...</h3>
                     <p class="text-secondary">The server was asleep. Retrying (${attempt}/${MAX_RETRIES}) — this takes up to 60 seconds on first load.</p>
                     <div style="margin-top:1rem; height:4px; border-radius:2px; background:rgba(255,255,255,0.1); overflow:hidden;">
-                        <div style="height:100%; width:${(attempt/MAX_RETRIES)*100}%; background:var(--accent-primary); transition:width 0.5s ease;"></div>
+                        <div style="height:100%; width:${(attempt / MAX_RETRIES) * 100}%; background:var(--accent-primary); transition:width 0.5s ease;"></div>
                     </div>
                 </div>`;
         }
@@ -278,23 +337,23 @@ async function openTeamFinder(eventId, eventTitle) {
     if (countdownInterval) clearInterval(countdownInterval);
 
     document.getElementById('team-finder-title').innerText = `Finding Teammates for ${eventTitle}`;
-    
+
     // Reset filter
     const filterInput = document.getElementById('teammate-filter');
     if (filterInput) filterInput.value = '';
-    
+
     // Simulate event stats based on eventId for consistency
     const totalSlots = 50 + (eventId % 5) * 10;
     const registered = 15 + (eventId % 20);
     const slotsLeft = totalSlots - registered;
-    
+
     document.getElementById('event-registered-teams').innerText = registered;
     document.getElementById('event-slots-left').innerText = slotsLeft;
 
     // Simulate a future deadline countdown (e.g., eventId * 2 + 3 days from now)
     const daysToAdd = (eventId % 5) + 3;
     const deadline = new Date().getTime() + (daysToAdd * 24 * 60 * 60 * 1000) + (Math.random() * 24 * 60 * 60 * 1000);
-    
+
     countdownInterval = setInterval(() => {
         const now = new Date().getTime();
         const distance = deadline - now;
@@ -312,7 +371,7 @@ async function openTeamFinder(eventId, eventTitle) {
 
         document.getElementById('event-countdown').innerText = `${days}d ${hours}h ${minutes}m ${seconds}s left`;
     }, 1000);
-    
+
     const container = document.getElementById('teammates-container');
     container.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;"><i class="fa-solid fa-spinner fa-spin"></i> Analyzing matches...</p>';
     switchView('teammates-view');
@@ -321,7 +380,7 @@ async function openTeamFinder(eventId, eventTitle) {
         const response = await fetch(`${API_BASE_URL}/matches/${eventId}`);
         if (!response.ok) throw new Error('Match engine not available');
         const matchedData = await response.json();
-        
+
         container.innerHTML = '';
 
         if (matchedData.length === 0) {
@@ -332,10 +391,10 @@ async function openTeamFinder(eventId, eventTitle) {
         matchedData.forEach(matchInfo => {
             const student = matchInfo.user;
             const simulatedMatch = matchInfo.matchScore;
-            
+
             let badgeColor = "var(--success)";
             let badgeBg = "rgba(16, 185, 129, 0.15)";
-            
+
             if (simulatedMatch < 65) {
                 badgeColor = "var(--text-muted)";
                 badgeBg = "rgba(100, 116, 139, 0.15)";
@@ -381,7 +440,7 @@ async function openTeamFinder(eventId, eventTitle) {
             container.insertAdjacentHTML('beforeend', studentCard);
         });
 
-    } catch(err) {
+    } catch (err) {
         console.error("Match engine error:", err);
         container.innerHTML = '<p class="text-center text-danger" style="grid-column: 1 / -1;">Failed to connect to the smart matching engine.</p>';
     }
@@ -429,7 +488,7 @@ function switchAuthTab(mode) {
     document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.auth-form').forEach(f => f.classList.add('hidden'));
     document.getElementById('auth-error-msg').classList.add('hidden');
-    
+
     document.getElementById(`tab-${mode}`).classList.add('active');
     document.getElementById(`${mode}-form`).classList.remove('hidden');
 }
@@ -439,26 +498,26 @@ async function handleLogin(e) {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     const errorMsg = document.getElementById('auth-error-msg');
-    
+
     try {
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-        
+
         if (!response.ok) {
             const errText = await response.text();
             throw new Error(errText || 'Invalid credentials');
         }
-        
+
         const user = await response.json();
         localStorage.setItem('skillsync-user', JSON.stringify(user));
-        
+
         closeAuthModal();
         checkAuthStatus();
-        
-        if(document.getElementById('dashboard-view').classList.contains('active-view')) {
+
+        if (document.getElementById('dashboard-view').classList.contains('active-view')) {
             switchView('dashboard-view');
         }
     } catch (err) {
@@ -474,22 +533,22 @@ async function handleSignup(e) {
     const password = document.getElementById('signup-password').value;
     const role = document.getElementById('signup-role').value;
     const errorMsg = document.getElementById('auth-error-msg');
-    
+
     try {
         const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password, role })
         });
-        
+
         if (!response.ok) {
             const errText = await response.text();
             throw new Error(errText || 'Registration failed');
         }
-        
+
         const user = await response.json();
         localStorage.setItem('skillsync-user', JSON.stringify(user));
-        
+
         closeAuthModal();
         checkAuthStatus();
     } catch (err) {
@@ -508,7 +567,7 @@ function checkAuthStatus() {
     const userJson = localStorage.getItem('skillsync-user');
     const authButtons = document.getElementById('auth-buttons');
     const profileBadge = document.getElementById('user-profile-badge');
-    
+
     if (userJson && authButtons && profileBadge) {
         const user = JSON.parse(userJson);
         authButtons.style.display = 'none';
@@ -516,21 +575,21 @@ function checkAuthStatus() {
         document.getElementById('nav-avatar').src = user.avatar || 'https://i.pravatar.cc/150?img=1';
         document.getElementById('nav-username').innerText = user.name;
         document.getElementById('nav-role').innerText = user.role || 'Student';
-        
+
         // Show Admin Nav Link if Role is Admin
         if (user.role === 'Admin') {
             document.getElementById('nav-admin-link').style.display = 'block';
         } else {
             document.getElementById('nav-admin-link').style.display = 'none';
         }
-        
+
         const dbName = document.querySelector('.profile-name');
-        if(dbName) dbName.innerText = user.name;
+        if (dbName) dbName.innerText = user.name;
         const dbRole = document.querySelector('.profile-role');
-        if(dbRole) dbRole.innerText = user.role;
+        if (dbRole) dbRole.innerText = user.role;
         const dbAvatar = document.querySelector('.profile-avatar');
-        if(dbAvatar) dbAvatar.src = user.avatar || 'https://i.pravatar.cc/150?img=1';
-        
+        if (dbAvatar) dbAvatar.src = user.avatar || 'https://i.pravatar.cc/150?img=1';
+
     } else if (authButtons && profileBadge) {
         authButtons.style.display = 'flex';
         profileBadge.style.display = 'none';
@@ -589,26 +648,26 @@ async function fetchAdminData() {
                 `;
             });
         }
-    } catch(err) {
+    } catch (err) {
         console.error("Failed to load admin data", err);
     }
 }
 
 async function deleteUser(id) {
-    if(!confirm("Are you sure you want to permanently delete this student account?")) return;
+    if (!confirm("Are you sure you want to permanently delete this student account?")) return;
     try {
         await fetch(`${API_BASE_URL}/admin/users/${id}`, { method: 'DELETE' });
         fetchAdminData();
-    } catch(err) { console.error(err); }
+    } catch (err) { console.error(err); }
 }
 
 async function deleteEvent(id) {
-    if(!confirm("Are you sure you want to permanently delete this hackathon?")) return;
+    if (!confirm("Are you sure you want to permanently delete this hackathon?")) return;
     try {
         await fetch(`${API_BASE_URL}/admin/events/${id}`, { method: 'DELETE' });
         fetchAdminData();
-        renderEvents(); 
-    } catch(err) { console.error(err); }
+        renderEvents();
+    } catch (err) { console.error(err); }
 }
 
 async function handleCreateEvent(e) {
@@ -638,7 +697,7 @@ async function handleCreateEvent(e) {
         } else {
             alert("Failed to create hackathon.");
         }
-    } catch(err) {
+    } catch (err) {
         console.error("Network Error forming Event: ", err);
         alert("Network Error.");
     }

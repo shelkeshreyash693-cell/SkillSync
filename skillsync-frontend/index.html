@@ -145,7 +145,8 @@
                 <aside class="dashboard-sidebar">
                     <div class="glass-panel profile-card">
                         <div class="profile-header">
-                            <img src="https://i.pravatar.cc/150?img=11" alt="Profile" class="profile-avatar">
+                            <img src="https://i.pravatar.cc/150?img=11" alt="Profile" class="profile-avatar" onclick="document.getElementById('avatar-upload').click()" style="cursor: pointer; transition: opacity 0.3s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" title="Click to update avatar">
+                            <input type="file" id="avatar-upload" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
                             <div class="level-badge">Lvl 12</div>
                         </div>
                         <h2 class="profile-name">Alex Developer</h2>

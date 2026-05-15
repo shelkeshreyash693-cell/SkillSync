@@ -23,7 +23,11 @@ public class User {
     private Integer projectsCompleted = 0;
     private String name;
     private String role;
-    private String avatar;
+    
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String avatar = "https://i.pravatar.cc/150?img=11";
+    
     private int level;
 
     @ElementCollection
