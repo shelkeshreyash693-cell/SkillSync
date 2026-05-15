@@ -175,6 +175,9 @@ async function uploadAvatar(event) {
             body: formData
         });
 
+        if (response.status === 404) {
+            throw new Error("User not found in database. The server may have restarted. Please log out and log in again.");
+        }
         if (!response.ok) throw new Error("Failed to upload avatar");
 
         const updatedUser = await response.json();
@@ -199,7 +202,7 @@ async function uploadAvatar(event) {
         console.error("Avatar upload error:", err);
         Swal.fire({
             title: 'Upload Failed',
-            text: 'Could not upload your profile picture. Please try again.',
+            text: err.message || 'Could not upload your profile picture. Please try again.',
             icon: 'error',
             confirmButtonColor: 'var(--danger)'
         });
