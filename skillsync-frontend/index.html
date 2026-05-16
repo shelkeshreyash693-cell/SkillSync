@@ -11,6 +11,10 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK (Compat versions for global access) -->
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -452,6 +456,26 @@
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%; border-radius: 8px;">Create Account <i class="fa-solid fa-user-plus"></i></button>
             </form>
+
+            <!-- Social Login Divider -->
+            <div style="display: flex; align-items: center; margin: 1.5rem 0; color: var(--text-secondary);">
+                <hr style="flex-grow: 1; border-color: var(--glass-border);">
+                <span style="padding: 0 1rem; font-size: 0.85rem;">OR CONTINUE WITH</span>
+                <hr style="flex-grow: 1; border-color: var(--glass-border);">
+            </div>
+
+            <!-- Social Login Buttons -->
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <button class="btn btn-secondary" onclick="handleSocialLogin('google')" style="width: 100%; justify-content: center; gap: 1rem; background: #fff; color: #333;">
+                    <i class="fa-brands fa-google text-danger"></i> Google
+                </button>
+                <button class="btn btn-secondary" onclick="handleSocialLogin('github')" style="width: 100%; justify-content: center; gap: 1rem; background: #24292e; color: #fff;">
+                    <i class="fa-brands fa-github"></i> GitHub
+                </button>
+                <button class="btn btn-secondary" onclick="handleSocialLogin('linkedin')" style="width: 100%; justify-content: center; gap: 1rem; background: #0077b5; color: #fff; border-color: #0077b5;">
+                    <i class="fa-brands fa-linkedin"></i> LinkedIn
+                </button>
+            </div>
         </div>
     </div>
 

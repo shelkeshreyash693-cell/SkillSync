@@ -5,6 +5,89 @@
 // Backend API Base URL
 const API_BASE_URL = 'https://skillsync-vvtm.onrender.com/api';
 
+// --- Firebase Configuration ---
+// TODO: Replace with your actual Firebase project config
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// Initialize Firebase only if API key is provided
+if (firebaseConfig.apiKey !== "YOUR_API_KEY" && window.firebase) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+// Social Login Handler
+async function handleSocialLogin(providerName) {
+    if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+        Swal.fire({
+            title: 'Configuration Needed',
+            text: 'Please add your Firebase config keys in script.js to enable social login!',
+            icon: 'info'
+        });
+        return;
+    }
+
+    let provider;
+    if (providerName === 'google') {
+        provider = new firebase.auth.GoogleAuthProvider();
+    } else if (providerName === 'github') {
+        provider = new firebase.auth.GithubAuthProvider();
+    } else if (providerName === 'linkedin') {
+        provider = new firebase.auth.OAuthProvider('linkedin.com');
+    }
+
+    try {
+        const result = await firebase.auth().signInWithPopup(provider);
+        const fbUser = result.user;
+        
+        // Prepare data for backend
+        const socialData = {
+            email: fbUser.email,
+            name: fbUser.displayName || 'Unknown User',
+            photoUrl: fbUser.photoURL,
+            provider: providerName
+        };
+
+        // Send to our Spring Boot backend
+        const response = await fetch(`${API_BASE_URL}/auth/social-login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(socialData)
+        });
+
+        if (!response.ok) throw new Error("Backend authentication failed");
+        
+        const dbUser = await response.json();
+        
+        // Save user session
+        localStorage.setItem('skillsync-user', JSON.stringify(dbUser));
+        closeAuthModal();
+        
+        Swal.fire({
+            title: 'Welcome!',
+            text: `Logged in successfully as ${dbUser.name}`,
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+        }).then(() => {
+            window.location.reload();
+        });
+
+    } catch (error) {
+        console.error("Social login error:", error);
+        Swal.fire({
+            title: 'Login Failed',
+            text: error.message,
+            icon: 'error'
+        });
+    }
+}
+
 // View Switching Logic
 function switchView(viewId) {
     // Basic routing

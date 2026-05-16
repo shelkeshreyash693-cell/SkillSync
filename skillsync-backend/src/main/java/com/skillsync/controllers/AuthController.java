@@ -53,6 +53,34 @@ public class AuthController {
         return ResponseEntity.ok(newUser);
     }
 
+    @PostMapping("/social-login")
+    public ResponseEntity<?> socialLogin(@RequestBody SocialLoginRequest request) {
+        Optional<User> userOpt = userRepository.findFirstByEmail(request.getEmail());
+        
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setPassword(null);
+            return ResponseEntity.ok(user);
+        }
+        
+        // If user doesn't exist, auto-register them using their social profile
+        User newUser = new User(
+            null,
+            request.getEmail(),
+            null, // No password for social login
+            null,
+            0,
+            request.getName(),
+            "Student", // Default role
+            request.getPhotoUrl() != null ? request.getPhotoUrl() : "https://i.pravatar.cc/150?img=" + (int)(Math.random() * 70),
+            1,
+            List.of("HTML/CSS", "Teamwork")
+        );
+        userRepository.save(newUser);
+        
+        return ResponseEntity.ok(newUser);
+    }
+
     // DTOs for Request Mapping
     public static class LoginRequest {
         private String email;
@@ -78,5 +106,21 @@ public class AuthController {
         public void setPassword(String password) { this.password = password; }
         public String getRole() { return role; }
         public void setRole(String role) { this.role = role; }
+    }
+
+    public static class SocialLoginRequest {
+        private String email;
+        private String name;
+        private String photoUrl;
+        private String provider;
+
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getPhotoUrl() { return photoUrl; }
+        public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
+        public String getProvider() { return provider; }
+        public void setProvider(String provider) { this.provider = provider; }
     }
 }
