@@ -47,7 +47,7 @@ public class UserController {
         Long userId = Long.valueOf(data.get("userId").toString());
         Integer projects = Integer.valueOf(data.get("projects").toString());
         String skillsStr = data.get("skills").toString();
-        List<String> skillsList = java.util.Arrays.asList(skillsStr.split(",\\s*"));
+        List<String> skillsList = new java.util.ArrayList<>(java.util.Arrays.asList(skillsStr.split(",\\s*")));
 
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) return ResponseEntity.notFound().build();

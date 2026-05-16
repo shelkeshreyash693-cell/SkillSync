@@ -45,7 +45,7 @@ public class AuthController {
             request.getRole() == null ? "Student" : request.getRole(),
             "https://i.pravatar.cc/150?img=" + (int)(Math.random() * 70), // Random avatar
             1,    // Starting Level 1
-            List.of("HTML/CSS", "Teamwork") // Default starter skills
+            new java.util.ArrayList<>(List.of("HTML/CSS", "Teamwork")) // Default starter skills
         );
         userRepository.save(newUser);
         newUser.setPassword(null); // Don't return password string
@@ -74,7 +74,7 @@ public class AuthController {
             "Student", // Default role
             request.getPhotoUrl() != null ? request.getPhotoUrl() : "https://i.pravatar.cc/150?img=" + (int)(Math.random() * 70),
             1,
-            List.of("HTML/CSS", "Teamwork")
+            new java.util.ArrayList<>(List.of("HTML/CSS", "Teamwork"))
         );
         userRepository.save(newUser);
         

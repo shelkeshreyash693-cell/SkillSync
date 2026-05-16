@@ -227,6 +227,14 @@ document.addEventListener('submit', async (e) => {
                 confirmButtonColor: 'var(--accent-primary)'
             });
             fetchUserProfile(user.id);
+        } else {
+            const errorText = await response.text();
+            Swal.fire({
+                title: 'Setup Failed',
+                text: errorText || 'An error occurred while saving your profile.',
+                icon: 'error',
+                confirmButtonColor: 'var(--danger)'
+            });
         }
     }
 });
