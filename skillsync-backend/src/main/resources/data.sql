@@ -39,7 +39,7 @@ INSERT INTO event_skills (event_id, skill) VALUES (8, 'Node.js'), (8, 'MongoDB')
 INSERT INTO event_skills (event_id, skill) VALUES (9, 'Unity'), (9, 'C#'), (9, 'Godot'), (9, 'Game Design');
 
 -- Insert Mock Users
-INSERT INTO users (name, email, password, role, avatar, level, projects) VALUES
+INSERT INTO users (name, email, password, role, avatar, level, projects_completed) VALUES
 ('Admin Master', 'admin@skillsync.edu', 'admin123', 'Admin', 'https://i.pravatar.cc/150?img=68', 99, 999),
 ('Priyanka S.', 'priyanka@skillsync.edu', 'password123', 'Frontend Specialist', 'https://i.pravatar.cc/150?img=5', 14, 12),
 ('Rahul M.', 'rahul@skillsync.edu', 'password123', 'Machine Learning Engineer', 'https://i.pravatar.cc/150?img=11', 18, 8),
