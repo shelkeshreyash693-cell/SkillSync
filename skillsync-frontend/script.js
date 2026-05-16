@@ -8,12 +8,13 @@ const API_BASE_URL = 'https://skillsync-vvtm.onrender.com/api';
 // --- Firebase Configuration ---
 // TODO: Replace with your actual Firebase project config
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDNa8CILwrgajTVqUbyMvBy91uStZsyxRI",
+    authDomain: "skillsync-5d4e9.firebaseapp.com",
+    projectId: "skillsync-5d4e9",
+    storageBucket: "skillsync-5d4e9.firebasestorage.app",
+    messagingSenderId: "1031201064348",
+    appId: "1:1031201064348:web:e1b86044487c4014ef3459",
+    measurementId: "G-GLNQX1RZ5G"
 };
 
 // Initialize Firebase only if API key is provided
@@ -44,7 +45,7 @@ async function handleSocialLogin(providerName) {
     try {
         const result = await firebase.auth().signInWithPopup(provider);
         const fbUser = result.user;
-        
+
         // Prepare data for backend
         const socialData = {
             email: fbUser.email,
@@ -61,13 +62,13 @@ async function handleSocialLogin(providerName) {
         });
 
         if (!response.ok) throw new Error("Backend authentication failed");
-        
+
         const dbUser = await response.json();
-        
+
         // Save user session
         localStorage.setItem('skillsync-user', JSON.stringify(dbUser));
         closeAuthModal();
-        
+
         Swal.fire({
             title: 'Welcome!',
             text: `Logged in successfully as ${dbUser.name}`,
@@ -264,10 +265,10 @@ async function uploadAvatar(event) {
         if (!response.ok) throw new Error("Failed to upload avatar");
 
         const updatedUser = await response.json();
-        
+
         // Update local storage
         localStorage.setItem('skillsync-user', JSON.stringify(updatedUser));
-        
+
         // Update the image on the screen dynamically
         document.querySelectorAll('.profile-avatar, #nav-avatar').forEach(img => {
             img.src = updatedUser.avatar;
